@@ -7,6 +7,7 @@ use App\Http\Requests\Api\v1\StoreProductRequest;
 use App\Http\Requests\Api\v1\UpdateProductRequest;
 use App\Http\Resources\Api\v1\ProductResource;
 use App\Models\Product;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class ProductController extends Controller
@@ -14,9 +15,14 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::latest()->paginate(10);
+        $products = Product::query()
+            ->search($request->query('search'))
+            ->minPrice($request->query('min_price'))
+            ->maxPrice($request->query('max_price'))
+            ->latest()
+            ->paginate(10);
 
         return ProductResource::collection($products);
     }
