@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\v1\StoreOrderRequest;
+use App\Jobs\ProcessOrderJob;
 use App\Services\OrderService;
 use Exception;
 use Illuminate\Http\Request;
@@ -36,6 +37,8 @@ class OrderController extends Controller
                 $request->user()->id,
                 $request->items
             );
+
+            ProcessOrderJob::dispatch($order);
 
             return response()->json([
                 'status' => 'success',
