@@ -4,7 +4,16 @@ use App\Http\Controllers\Api\v1\AuthController;
 use App\Http\Controllers\Api\v1\OrderController;
 use App\Http\Controllers\Api\v1\ProductController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
+
+//Test Redis Connection
+Route::get('/test-redis', function () {
+    dump(config('cache.default'));
+    dump(Cache::getDefaultDriver());
+    Cache::put('test_key', 'Hello Raj, Redis is working!', 60);
+    return response()->json(['message' => 'Data written to Redis']);
+});
 
 // v1 Prefix Group
 Route::prefix('v1')->middleware('throttle:global_api_rate_limiter')->group(function () {
