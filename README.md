@@ -279,29 +279,108 @@ This guarantees:
 
 ---
 
-# 🐳 Step 1 — Run Redis inside Ubuntu Docker
+# 🐳 Redis Setup
+
+You can run Redis in **two different ways** depending on your development environment.
+
+---
+
+# Option 1 — Redis in Local Docker (Recommended)
+
+If Docker is installed on your local machine (Windows/Linux/macOS), run Redis using the following command:
 
 ```bash
 docker run -d \
 --name redis-local \
 -p 6379:6379 \
 redis:alpine \
---requirepass "your_secure_password"
+redis-server --requirepass "your_secure_password"
 ```
 
-Find Ubuntu VM IP
+Verify that the container is running:
+
+```bash
+docker ps
+```
+
+Example output:
+
+```text
+CONTAINER ID   IMAGE          PORTS
+xxxxxxxxxxxx   redis:alpine   0.0.0.0:6379->6379/tcp
+```
+
+Configure your Laravel `.env` file:
+
+```env
+QUEUE_CONNECTION=redis
+CACHE_STORE=redis
+
+REDIS_CLIENT=predis
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_PASSWORD=your_secure_password
+
+REDIS_DB=0
+REDIS_CACHE_DB=1
+```
+
+> **Note**
+>
+> If Laravel and Redis are running on the same machine, use:
+>
+> ```
+> REDIS_HOST=127.0.0.1
+> ```
+
+---
+
+# Option 2 — Redis in Ubuntu VM (Docker)
+
+If you're using **Oracle VM VirtualBox** with an Ubuntu virtual machine, ensure the VM network is configured as **Bridged Adapter**.
+
+Run Redis inside Docker:
+
+```bash
+docker run -d \
+--name redis-local \
+-p 6379:6379 \
+redis:alpine \
+redis-server --requirepass "your_secure_password"
+```
+
+Find your Ubuntu VM IP address:
 
 ```bash
 hostname -I
 ```
 
-Example
+Example:
 
-```
+```text
 192.168.1.15
 ```
 
----
+Update Laravel's `.env` file on the Windows host:
+
+```env
+QUEUE_CONNECTION=redis
+CACHE_STORE=redis
+
+REDIS_CLIENT=predis
+REDIS_HOST=192.168.1.15
+REDIS_PORT=6379
+REDIS_PASSWORD=your_secure_password
+
+REDIS_DB=0
+REDIS_CACHE_DB=1
+```
+
+> **Note**
+>
+> Replace `192.168.1.15` with the IP address of your Ubuntu VM.
+>
+> Make sure both the Windows host and Ubuntu VM are connected to the same network through the **Bridged Adapter**.
 
 # 💻 Step 2 — Install Laravel
 
